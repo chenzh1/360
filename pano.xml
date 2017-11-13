@@ -1,0 +1,115 @@
+﻿<krpano>
+	
+	<!-- the skin -->
+	<include url="skin/defaultskin.xml" />
+	
+	<!-- view settings -->
+	<view hlookat="0" vlookat="0" maxpixelzoom="1.0" fovmax="150" limitview="auto" />
+	
+
+	<preview url="qtest.tiles/preview.jpg" />
+
+	<image type="CUBE" multires="true" tilesize="512">
+		<level tiledimagewidth="1280" tiledimageheight="1280">
+			<cube url="qtest.tiles/%s/l2/%v/l2_%s_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="640" tiledimageheight="640">
+			<cube url="qtest.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+		</level>
+	</image>
+<action name="do_crop_animation" scope="local" args="framewidth, frameheight, framerate">
+		<!-- define local variables -->
+		calc(local.xframes, (caller.imagewidth /framewidth) BOR 0);
+		calc(local.frames, xframes * ((caller.imageheight / frameheight) BOR 0));
+		def(local.frame, integer, 0);
+		
+		<!-- set the first frame -->
+		calc(caller.crop, '0|0|' + framewidth + '|' + frameheight);
+		
+		<!-- do the animation -->
+		setinterval(calc('crop_anim_' + caller.name), calc(1.0 / framerate),
+			if(caller.loaded,
+				inc(frame);
+				if(frame GE frames, if(caller.onlastframe !== null, callwith(caller, onlastframe() ) ); set(frame,0); );
+				mod(xpos, frame, xframes);
+				div(ypos, frame, xframes);
+				Math.floor(ypos);
+				mul(xpos, framewidth);
+				mul(ypos, frameheight);
+				calc(caller.crop, xpos + '|' + ypos + '|' + framewidth + '|' + frameheight);
+			  ,
+				<!-- stop the interval when the hotspot gets removed -->
+				clearinterval(calc('crop_anim_' + caller.name));
+			);
+		);
+	</action>
+
+	<hotspot name="spot8" url="explosion.png"                 onloaded="do_crop_animation(100,100, 60)"  />
+	<!-- randomize the autorotation horison setting every 4 seconds -->
+	<action name="randomizehorizon" autorun="onstart">
+		calc(autorotate.horizon, (random - 0.5) * 180.0);
+		delayedcall(4, randomizehorizon() );
+	</action>
+		
+
+	<!-- the snow plugin -->
+	<plugin name="snow" zorder="1"
+	        url.html5="snow.js"
+	        url.flash="snow.swf"
+	        floor="0.7"
+	        onloaded="snowballs();"
+	        />
+	        <action name="snowballs">
+		set(plugin[snow].mode,          image);
+		set(plugin[snow].imageurl,      'snowball.png');
+		set(plugin[snow].blendmode,     normal);
+		set(plugin[snow].flakes,        1000);
+		set(plugin[snow].imagescale,    0.5);
+		set(plugin[snow].speed,         2.0);
+		set(plugin[snow].shake,         4.0);
+		set(plugin[snow].speedvariance, 2.0);
+		set(plugin[snow].spreading,     2.0);
+		set(plugin[snow].wind,          0.0);
+	</action>
+<!-- <action name="money">
+		set(plugin[snow].mode,          image);
+		set(plugin[snow].imageurl,      '%CURRENTXML%/money.png');
+		set(plugin[snow].blendmode,     normal);
+		set(plugin[snow].flakes,        500);
+		set(plugin[snow].imagescale,    0.8);
+		set(plugin[snow].speed,         0.8);
+		set(plugin[snow].shake,         8.0);
+		set(plugin[snow].speedvariance, 3.0);
+		set(plugin[snow].spreading,     2.5);
+		set(plugin[snow].wind,          0.0);
+	</action>
+	 -->
+	<!-- include the combobox.xml plugin -->
+	<!-- <include url="%SWFPATH%/plugins/combobox.xml" /> -->
+	
+	<!-- and a combobox for selecting different snow effects -->
+	<!-- <combobox name="combobox" design="vtour" align="leftbottom" x="20" y="20" zorder="2">
+		<item name="opt1"  caption="Snow Balls"      onclick="snowballs();"   />
+		<item name="opt2"  caption="Snow Flakes"     onclick="snowflakes();"  />
+		<item name="opt3"  caption="Silver Stars"    onclick="silverstars();" />
+		<item name="opt4"  caption="Golden Stars"    onclick="goldenstars();" />
+		<item name="opt5"  caption="Hearts"          onclick="hearts();"      />
+		<item name="opt6"  caption="Smileys"         onclick="smileys();"     />
+		<item name="opt7"  caption="Money"           onclick="money();"       />
+		<item name="opt8"  caption="Rain"            onclick="rain();"        />
+		<item name="opt9"  caption="Heavy Rain"      onclick="heavyrain();"   />
+		<item name="opt10" caption="Default Snow"    onclick="defaultsnow();" />
+	</combobox> -->
+	<combobox name="combobox" design="vtour" align="leftbottom" x="20" y="20" zorder="2">
+		<item name="opt1"  caption="Snow Balls"      onclick="snowballs();"   />
+		<item name="opt2"  caption="Snow Flakes"     onclick="snowflakes();"  />
+		<item name="opt3"  caption="Silver Stars"    onclick="silverstars();" />
+		<item name="opt4"  caption="Golden Stars"    onclick="goldenstars();" />
+		<item name="opt5"  caption="Hearts"          onclick="hearts();"      />
+		<item name="opt6"  caption="Smileys"         onclick="smileys();"     />
+		<item name="opt7"  caption="Money"           onclick="money();"       />
+		<item name="opt8"  caption="Rain"            onclick="rain();"        />
+		<item name="opt9"  caption="Heavy Rain"      onclick="heavyrain();"   />
+		<item name="opt10" caption="Default Snow"    onclick="defaultsnow();" />
+	</combobox>
+</krpano>
